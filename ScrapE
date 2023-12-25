@@ -1,0 +1,126 @@
+const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch({
+    headless: true,
+    ignoreHTTPSErrors: true
+    // Other options if needed
+  });
+
+  const page = await browser.newPage();
+  //await page.setViewport({ width: 1200, height: 1400 })
+  await page.goto('https://10.229.157.101/emgui/#login');
+
+  const elementXPath = '/html/body/div[3]/div/div/div[2]/div[2]/button[2]';
+  await page.waitForXPath(elementXPath);
+  const [button] = await page.$x(elementXPath);
+  if (button) {
+    await button.click();
+  } else {
+    console.error('Không tìm thấy phần tử với XPath đã cho');
+  }
+  //Login
+  const userXPath = '/html/body/div[3]/div/div/div[2]/div[3]/form/div/div/input[1]';
+  const passwordXPath = '/html/body/div[3]/div/div/div[2]/div[3]/form/div/div/input[2]';
+  const loginBtnXPath = '/html/body/div[3]/div/div/div[2]/div[3]/form/div/button';
+  //CLick btn
+  const mobrowseXPath ='/html/body/div[3]/div/div/div[1]/div[1]/div/div[1]/div/div/a[2]/span';   
+  const smalliconXPath ='/html/body/div[3]/div/div/div[1]/div[1]/div/div[1]/span/i';         
+  //Scape
+const inputSelector = '#search > div > span.elLib-wMoSearchWithButton-combobox > div > input';
+const searchMoXPath ='//*[@id="search"]/div/span[2]/button/span/i';
+const LDNXPath ='/html/body/div[3]/div/div/div[1]/div[4]/div/div[3]/div/div[3]/div/div[4]/div/div[3]/div/div[2]/div/div[2]/table/tbody/tr/td';
+const myValueXpath = '/html/body/div[6]/div/div[2]/div/div[2]/div/div/div[4]/div/div[2]/div/div[2]/div/div[2]/div/div[14]/div/div[2]/div/div';
+//valus search
+const newText = 'ManagedElement=1,SystemFunctions=1,Pm=1,PmGroup=PmUeMeasControl,MeasurementType=pmUeMeasRsrqDeltaInterFreq1';                 
+  
+                            
+  // Đợi các trường input và nút đăng nhập xuất hiện trên trang
+  await page.waitForXPath(userXPath);
+  await page.waitForXPath(passwordXPath);
+  await page.waitForXPath(loginBtnXPath);
+
+  // Tìm và nhập thông tin user và password vào các trường input
+  const userInput = await page.$x(userXPath);
+  const passwordInput = await page.$x(passwordXPath);
+
+  if (userInput[0] && passwordInput[0]) {
+    await userInput[0].type('rbs');
+    await passwordInput[0].type('rbs');
+  } else {
+    console.error('Không tìm thấy trường input với XPath đã cho');
+  }
+
+  // Tìm và click vào nút đăng nhập
+  const [loginBtn] = await page.$x(loginBtnXPath);
+  if (loginBtn) {
+    await loginBtn.click();
+  } else {
+    console.error('Không tìm thấy nút đăng nhập với XPath đã cho');
+  }
+
+  //Xpath smallIcon
+  await page.waitForXPath(smalliconXPath);
+  const [smallicon] = await page.$x(smalliconXPath, { timeout: 10000 });
+  if (smallicon) {
+    await smallicon.click();
+    } else {
+   }  
+
+//Xpath moBrowser
+  const [mobrowser] = await page.$x(mobrowseXPath);
+  if (mobrowser) {
+    await mobrowser.click();
+    } else {
+   }  
+/////////////////////////////////////////////////
+try {
+  await page.waitForSelector(inputSelector);
+
+  // Click vào ô input trước khi xóa giá trị
+  await page.evaluate((inputSelector) => {
+    const inputField = document.querySelector(inputSelector);
+    if (inputField) {
+      inputField.click();
+    }
+  }, inputSelector);
+
+  await page.waitForTimeout(1000);
+  // Xóa nội dung hiện có trong ô input
+  await page.$eval(inputSelector, input => input.value = '');
+
+  // Nhập giá trị newText vào ô input
+  await page.type(inputSelector, newText);
+
+  // Chờ cho nút search được xuất hiện và click
+  await page.waitForXPath(searchMoXPath);
+  const [searchMo] = await page.$x(searchMoXPath);
+  await searchMo.click();
+  //console.log('Đã click');
+  } catch (error) {
+  console.error('Không tìm thấy trường input với CSS selector đã cho hoặc có lỗi xảy ra:', error);
+}
+
+await page.waitForTimeout(1000);
+//console.log('Đang tìm kiếm phần tử LDN');
+const [LDN] = await page.$x(LDNXPath);
+if (LDN) {
+  //console.log('Tìm thấy phần tử LDN');
+  await LDN.click();
+} else {
+  console.log('Không tìm thấy phần tử LDN');
+}
+
+await page.waitForTimeout(1000);
+const myValue = await page.evaluate((xpath) => {
+  const element = document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  return element ? element.textContent : 'Không tìm thấy phần tử với XPath đã cho';
+}, myValueXpath);
+
+console.log('Giá trị cần tìm:', myValue);
+
+
+
+
+await browser.close()
+})();
