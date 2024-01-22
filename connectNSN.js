@@ -77,25 +77,7 @@ const readline = require('readline').createInterface({
 
   //scraping
 
-//Input param
-  // readline.question('Vui lòng nhập xPath: ', async fanStatusXpath => {
-  //   fanStatusXpath = fanStatusXpath.replace(/\[@id="[^"]*"\]/g, "[@class='new-site']");
-  //   console.log('fanStatusXpath sau khi thay đổi:', fanStatusXpath);
-
-  //   // Tiếp tục với việc sử dụng fanStatusXpath trong các bước tiếp theo của bạn
-  //   await page.waitForXPath(fanStatusXpath);
-  //   const [fanR2] = await page.$x(fanStatusXpath);
-  //   if (fanR2) {
-  //       await fanR2.click();
-  //       console.log('Đã click vào fanR2 với selector đã cho.');
-  //   } else {
-  //       console.error('Không tìm thấy fanR2 với Xpath đã cho.');
-  //   }
-  //   readline.close();
-
-  // });
-
-    //Lay gia tri Xpath TB
+  //Lay gia tri Xpath TB
     readline.question('Vui lòng nhập xPath Cellphone: ', async cellphoneXpath => {
     await page.waitForXPath(cellphoneXpath);
     const [cellphone] = await page.$x(cellphoneXpath);
